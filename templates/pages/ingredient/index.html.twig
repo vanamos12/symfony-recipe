@@ -7,8 +7,10 @@
 <div class="container">
     <h1>Mes ingrédients</h1>
 
+    <a href="{{ path('ingredient.new') }}" class="btn btn-primary">Créer un ingrédient</a>
+
     {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
+        <div class="alert alert-success mt-4">
             {{ message }}
         </div>
     {% endfor %}
@@ -23,6 +25,8 @@
       <th scope="col">Nom</th>
       <th scope="col">Prix</th>
       <th scope="col">Date de création</th>
+      <th scope="col">Edition</th>
+      <th scope="col">Suppression</th>
     </tr>
   </thead>
   <tbody>
@@ -32,6 +36,8 @@
           <td>{{ingredient.name}}</td>
           <td>{{ingredient.price}}</td>
           <td>{{ingredient.createdAt | date('d/m/Y')}}</td>
+          <td><a href="{{ path('ingredient.edit', { 'id' : ingredient.id})}}" class="btn btn-info">Modifier</a></td>
+          <td><a href="{{ path('ingredient.delete', { 'id' : ingredient.id})}}" class="btn btn-danger">Supprimer</a></td>
         </tr>
     {% endfor %}
     

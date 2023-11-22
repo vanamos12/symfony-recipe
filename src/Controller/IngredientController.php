@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class IngredientController extends AbstractController
 {
     /**
-     * This function display all ingredients
+     * This controller display all ingredients
      *
      * @param IngredientRepository $repository
      * @param PaginatorInterface $paginator
@@ -41,7 +41,13 @@ class IngredientController extends AbstractController
         ]);
     }
 
-
+    /**
+     * THis controller show a formular to create an ingredient.
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return Response
+     */
     #[Route("/ingredient/nouveau",name:"ingredient.new", methods:['GET', 'POST'])]
     public function new(
         Request $request,
@@ -70,4 +76,63 @@ class IngredientController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
+    #[Route('/ingredient/edition/{id}', name:'ingredient.edit', methods:['GET', 'POST'])]
+    public function edit(
+        IngredientRepository $repository,
+        int $id,
+        Request $request,
+        EntityManagerInterface $manager
+    ) : Response {
+        $ingredient = $repository->findOneBy(['id' => $id]);
+        $form = $this->createForm(IngredientType::class, $ingredient);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()){
+            $ingredient = $form->getData();
+
+            $manager->persist($ingredient);
+            $manager->flush();
+
+            $this->addFlash(
+                'success',
+                'Votre ingrédient a été modifiée avec succès !'
+            );
+
+            return $this->redirectToRoute('ingredient.index');
+
+        }
+
+        return $this->render('pages/ingredient/edit.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    #[Route('/ingredient/suppression/{id}', 'ingredient.delete', methods:['GET'])]
+    public function delete(
+        IngredientRepository $repository,
+        EntityManagerInterface $manager,
+        int $id
+    ) : Response{
+        $ingredient = $repository->findOneBy(['id' => $id]);
+
+        if (!$ingredient){
+            $this->addFlash(
+                'success',
+                'L\'ingrédient en question n\'a pas été trouvé !'
+            );
+    
+            return $this->redirectToRoute('ingredient.index');
+        }
+
+        $manager->remove($ingredient);
+        $manager->flush();
+
+        $this->addFlash(
+            'success',
+            'Un ingrédient a été supprimé avec succès !'
+        );
+
+        return $this->redirectToRoute('ingredient.index');
+    } 
 }
