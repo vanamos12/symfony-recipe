@@ -36,7 +36,8 @@ class Ingredient
     #[ORM\ManyToMany(targetEntity: Recipe::class, mappedBy: 'ingredients')]
     private Collection $recipes;
 
-    
+    #[ORM\ManyToOne(inversedBy: 'ingredients')]
+    private ?User $user = null;
 
     public function __construct(){
         $this->createdAt = new \DateTimeImmutable();
@@ -115,5 +116,18 @@ class Ingredient
     {
         return $this->name;
     }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
 
 }
