@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Http\Attribute\Security;
 
 class UserController extends AbstractController
 {
@@ -24,6 +26,7 @@ class UserController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return Response
      */
+    #[Security("is_granted('ROLE_USER') and user === repository.find(id)")]
     #[Route('/utilisateur/edition/{id}', name: 'user.edit')]
     public function edit(
         int $id, 
@@ -68,6 +71,7 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[Security("is_granted('ROLE_USER') and user === repository.find(id)")]
     #[Route('/utilisateur/edition-mot-de-passe/{id}', 'user-edit-password', methods:['GET', 'POST'])]
     public function editPass(
         int $id,

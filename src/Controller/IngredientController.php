@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Http\Attribute\Security;
 
 class IngredientController extends AbstractController
 {
@@ -23,6 +25,7 @@ class IngredientController extends AbstractController
      * @return Response
      */
     #[Route('/ingredient', name: 'ingredient.index', methods:['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function index(
         IngredientRepository $repository,
         PaginatorInterface $paginator,
@@ -59,6 +62,7 @@ class IngredientController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()){
             $ingredient = $form->getData();
+            $ingredient->setUser($this->getUser());
 
             $manager->persist($ingredient);
             $manager->flush();
@@ -77,6 +81,7 @@ class IngredientController extends AbstractController
         ]);
     }
 
+    #[Security("is_granted('ROLE_USER') and user === repository.find(id).getUser()")]
     #[Route('/ingredient/edition/{id}', name:'ingredient.edit', methods:['GET', 'POST'])]
     public function edit(
         IngredientRepository $repository,

@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Http\Attribute\Security;
 
 class RecipeController extends AbstractController
 {
@@ -24,13 +26,14 @@ class RecipeController extends AbstractController
      * @return Response
      */
     #[Route('/recette', name: 'recipe.index', methods:['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function index(
         RecipeRepository $repository, 
         PaginatorInterface $paginator, 
         Request $request): Response
     {
         $recipes = $paginator->paginate(
-            $repository->findAll(), /* query NOT result */
+            $repository->findBy(['user' => $this->getUser()]), /* query NOT result */
             $request->query->getInt('page', 1), /*page number*/
             10 /*limit per page*/
         );
@@ -57,6 +60,7 @@ class RecipeController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()){
             $recipe = $form->getData();
+            $recipe->setUser($this->getUser());
 
             $manager->persist($recipe);
             $manager->flush();
@@ -74,6 +78,7 @@ class RecipeController extends AbstractController
     /**
      * This controller allows us to edit a recipe
      */
+    #[Security("is_granted('ROLE_USER') and user === repository.find(id).getUser()")]
     #[Route('/recette/edition/{id}', name:'recipe.edit', methods:['GET', 'POST'])]
     public function edit(
         RecipeRepository $repository,

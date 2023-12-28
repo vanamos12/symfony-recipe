@@ -64,6 +64,9 @@ class Recipe
     #[Assert\NotNull()]
     #[Assert\NotBlank()]
     private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'recipes')]
+    private ?User $user = null;
     
 
     public function __construct()
@@ -212,6 +215,18 @@ class Recipe
     public function setDescription(string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
