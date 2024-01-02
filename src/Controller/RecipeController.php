@@ -159,7 +159,7 @@ class RecipeController extends AbstractController
         ]);
     }
 
-    #[Security("is_granted('ROLE_USER') and repository.find(id).getIsPublic() === true")]
+    #[Security("is_granted('ROLE_USER') and (repository.find(id).getIsPublic() === true || user===repository.find(id).getUser())")]
     #[Route('/recette/{id}', 'recipe.show', methods:['GET', 'POST'])]
     public function show(
         RecipeRepository $recipeRepository,
