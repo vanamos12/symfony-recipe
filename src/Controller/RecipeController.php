@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Attribute\Security;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 class RecipeController extends AbstractController
 {
@@ -87,8 +88,12 @@ class RecipeController extends AbstractController
         RecipeRepository $repository,
         int $id,
         Request $request,
+        /*#[MapEntity(mapping: ['id' => 'id'])]
+        Recipe $recipe,*/
         EntityManagerInterface $manager
     ) : Response {
+        //dd($recipe);
+        
         $recipe = $repository->findOneBy(['id' => $id]);
         $form = $this->createForm(RecipeType::class, $recipe);
 
@@ -113,6 +118,7 @@ class RecipeController extends AbstractController
         ]);
     }
 
+    #[Security("is_granted('ROLE_USER') and user === repository.find(id).getUser()")]
     #[Route('/recette/suppression/{id}', name:'recipe.delete', methods:['GET'])]
     public function delete(
         RecipeRepository $repository,
@@ -141,7 +147,7 @@ class RecipeController extends AbstractController
         return $this->redirectToRoute('recipe.index');
     } 
 
-    #[Route('/recette/publique', 'recipe.index.public', methods:['GET'])]
+    #[Route('/recette/communaute', 'recipe.community', methods:['GET'])]
     public function indexPublic(
         RecipeRepository $repository,
         PaginatorInterface $paginator,

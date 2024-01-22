@@ -113,6 +113,7 @@ class IngredientController extends AbstractController
         ]);
     }
 
+    #[Security("is_granted('ROLE_USER') and user === repository.find(id).getUser()")]
     #[Route('/ingredient/suppression/{id}', 'ingredient.delete', methods:['GET'])]
     public function delete(
         IngredientRepository $repository,
