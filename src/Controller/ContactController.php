@@ -29,6 +29,11 @@ class ContactController extends AbstractController
             ->setEmail($user->getEmail());
 
         }
+
+        //if ($request->query->get('env') == 'test'){
+            $form->remove('captcha');
+        //}
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()){
             $contact = $form->getData();
