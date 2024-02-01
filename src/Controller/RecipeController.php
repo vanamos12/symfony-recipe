@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Attribute\Security;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class RecipeController extends AbstractController
 {
@@ -154,8 +156,14 @@ class RecipeController extends AbstractController
         Request $request
     ) : Response{
 
+        $cache = new FilesystemAdapter();
+        $data = $cache->get('recipes', function (ItemInterface $item) use ($repository){
+            $item->expiresAfter(20);
+            return $repository->findPublicRecipe(null);
+        });
+
         $recipes = $paginator->paginate(
-            $repository->findPublicRecipe(null),
+            $data,
             $request->query->getInt('page', 1),
             10
         );

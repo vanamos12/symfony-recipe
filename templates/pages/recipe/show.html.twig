@@ -35,7 +35,7 @@
         <div class="mt-4">
             {% if recipe.time %}
                 <p>Temps (en minutes) :
-                    {{ recipe.time }}
+                    {{ recipe.time | min_to_hour }}
                 </p>
             {% else %}
                 <p>Temps non renseigné
