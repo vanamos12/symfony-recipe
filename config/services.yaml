@@ -30,3 +30,7 @@ services:
         #resource: "../src/Entity/"
         #bind:
             #['$id':'@id']
+
+
+    App\EventListener\ExceptionListener:
+        tags: [kernel.event_listener]
